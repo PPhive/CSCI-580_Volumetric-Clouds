@@ -5,13 +5,12 @@ public class FlightControl : MonoBehaviour
     float Yaw;
     float Pitch;
     float Roll;
-
-    float CamYaw;
-    float CamPitch;
-    float CamRoll;
+    float Speed;
 
     [SerializeField]
     GameObject CamNode;
+    [SerializeField]
+    Camera camera;
 
     void Start()
     {
@@ -23,7 +22,7 @@ public class FlightControl : MonoBehaviour
     {
         FlightInputUpdate();
         CamUpdate();
-        transform.position += transform.forward * Time.deltaTime * 10f; // Move forward at a speed of 10 units per second
+
     }
 
     private void FlightInputUpdate() //Sets a target rotation based on input and lerps to it
@@ -63,11 +62,20 @@ public class FlightControl : MonoBehaviour
 
         Vector3 rotatespd = new Vector3(Pitch, Yaw, Roll) * Time.deltaTime * 120f;
         transform.Rotate(rotatespd);
+
+        float TargetSpeed = 10;
+        if (Input.GetKey(KeyCode.Space))
+        {
+            TargetSpeed += 10f;
+        }
+        Speed = Mathf.Lerp(Speed, TargetSpeed, Time.deltaTime * 4f);
+        transform.position += transform.forward * Time.deltaTime * Speed;
     }
 
     void CamUpdate()  //Bend camera the other way when plane rotates.
     {
         CamNode.transform.localEulerAngles = -10 * new Vector3(Pitch, Yaw, Roll);
+        camera.fieldOfView = 40 + Speed * 2;
     }
 
 }
