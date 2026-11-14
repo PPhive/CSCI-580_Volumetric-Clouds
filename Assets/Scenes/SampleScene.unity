@@ -351,11 +351,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resolution: 512
   perlinPowerA: 3
-  AlphaA: 0.447
+  AlphaA: 0.5
   perlinPowerB: 5
   AlphaB: 0.319
   perlinPowerC: 8
-  AlphaC: 0.229
+  AlphaC: 0.176
   texture2D: {fileID: 0}
 --- !u!1 &410087039
 GameObject:
