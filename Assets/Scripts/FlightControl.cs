@@ -64,7 +64,7 @@ public class FlightControl : MonoBehaviour
         transform.Rotate(rotatespd);
 
         float TargetSpeed = 10;
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.LeftShift))
         {
             TargetSpeed += 10f;
         }

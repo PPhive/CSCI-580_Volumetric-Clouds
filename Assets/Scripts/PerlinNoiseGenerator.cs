@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using UnityEngine;
 
 public class PerlinNoiseGenerator : MonoBehaviour
@@ -29,9 +30,9 @@ public class PerlinNoiseGenerator : MonoBehaviour
     void Start()
     {
         texture2D = new Texture2D(resolution, resolution);
-        texture2Da = Generate2DPerlinNoiseTexture(new Texture2D(resolution, resolution), perlinPowerA);
-        texture2Db = Generate2DPerlinNoiseTexture(new Texture2D(resolution, resolution), perlinPowerB);
-        texture2Dc = Generate2DPerlinNoiseTexture(new Texture2D(resolution, resolution), perlinPowerC);
+        texture2Da = Generate2DPerlinNoiseTexture(texture2D.width, perlinPowerA);
+        texture2Db = Generate2DPerlinNoiseTexture(texture2D.width, perlinPowerB);
+        texture2Dc = Generate2DPerlinNoiseTexture(texture2D.width, perlinPowerC);
 
         for (int i = 0; i < texture2D.width; i++)
         {
@@ -62,8 +63,10 @@ public class PerlinNoiseGenerator : MonoBehaviour
 
     }
 
-    public Texture2D Generate2DPerlinNoiseTexture(Texture2D texture, int perlinPower)
+    public Texture2D Generate2DPerlinNoiseTexture(int resolution, int perlinPower)
     {
+        Texture2D texture = new Texture2D(resolution, resolution);
+
         //Inital checks for perlinPower, if it's too low or too high, return the texture without generating noise
         if (perlinPower < 1)
         {
@@ -77,6 +80,8 @@ public class PerlinNoiseGenerator : MonoBehaviour
         }
         int VectorDimention = Mathf.FloorToInt(Mathf.Pow(2, perlinPower));
         Vector2[,] vectors2D = new Vector2[VectorDimention + 1, VectorDimention + 1]; //Number of vectors in one dimension, +1 so it wraps around
+
+
 
         //Resize the texture if it's too small or not divisible by 2^perlinPower
         if (texture.width < VectorDimention) 
