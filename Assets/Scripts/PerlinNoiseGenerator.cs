@@ -1,5 +1,6 @@
 using UnityEngine;
 
+//This 
 public class PerlinNoiseGenerator : MonoBehaviour
 {
     public static PerlinNoiseGenerator instance; 
@@ -32,11 +33,13 @@ public class PerlinNoiseGenerator : MonoBehaviour
     {
         instance = this;
 
+        //Creates a multi channel perlin noise for cloud rendering.
         texture2D = new Texture2D(resolution, resolution);
         texture2Da = Generate2DPerlinNoiseTexture(texture2D.width, perlinPowerA);
         texture2Db = Generate2DPerlinNoiseTexture(texture2D.width, perlinPowerB);
         texture2Dc = Generate2DPerlinNoiseTexture(texture2D.width, perlinPowerC);
 
+        //Merges all 3 subchannels into one. Btw the final channel uses alphat channel for sake of transparancy.
         for (int i = 0; i < texture2D.width; i++)
         {
             for (int j = 0; j < texture2D.height; j++)
@@ -63,13 +66,6 @@ public class PerlinNoiseGenerator : MonoBehaviour
     {
 
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     public Texture2D Generate2DPerlinNoiseTexture(int resolution, int perlinPower)
     {
         Texture2D texture = new Texture2D(resolution, resolution);
@@ -133,19 +129,22 @@ public class PerlinNoiseGenerator : MonoBehaviour
         {
             for (int j = 0; j < texture.height; j++)
             {
-                int gridX = Mathf.FloorToInt(i / pixelPerVector); //Index of the vector grid cell that this pixel belongs to
-                int gridY = Mathf.FloorToInt(j / pixelPerVector); //Index of the vector grid cell that this pixel belongs to
+                int gridX = Mathf.FloorToInt(i / pixelPerVector); //Index of the vector grid row that this pixel belongs to
+                int gridY = Mathf.FloorToInt(j / pixelPerVector); //Index of the vector grid column that this pixel belongs to
 
+                //Take dot products of four nearby vectors
                 float dot0 = Vector2.Dot(vectors2D[gridX, gridY], (new Vector2(i, j) - new Vector2(gridX, gridY) * pixelPerVector) / pixelPerVector);
                 float dot1 = Vector2.Dot(vectors2D[gridX + 1, gridY], (new Vector2(i, j) - new Vector2(gridX + 1, gridY) * pixelPerVector) / pixelPerVector);
                 float dot2 = Vector2.Dot(vectors2D[gridX, gridY + 1], (new Vector2(i, j) - new Vector2(gridX, gridY + 1) * pixelPerVector) / pixelPerVector);
                 float dot3 = Vector2.Dot(vectors2D[gridX + 1, gridY + 1], (new Vector2(i, j) - new Vector2(gridX + 1, gridY + 1) * pixelPerVector) / pixelPerVector);
 
+                //This is the smoother curve on slide-12.
                 float localX = (i - gridX * pixelPerVector) / (float)pixelPerVector;
                 float localY = (j - gridY * pixelPerVector) / (float)pixelPerVector;
-                float smoothXCurve = 3f * localX * localX - 2f * localX * localX * localX;
-                float smoothYCurve = 3f * localY * localY - 2f * localY * localY * localY;
+                float smoothXCurve = 3 * localX * localX - 2 * localX * localX * localX; //x = 3y^2 - 2y^3
+                float smoothYCurve = 3 * localY * localY - 2 * localY * localY * localY; //y = 3x^2 - 2x^3
 
+                //Lerp using curves above
                 float lerp01 = Mathf.Lerp(dot0, dot1, smoothXCurve);
                 float lerp23 = Mathf.Lerp(dot2, dot3, smoothXCurve);
                 float finalLerp = Mathf.Lerp(lerp01, lerp23, smoothYCurve);
@@ -159,6 +158,7 @@ public class PerlinNoiseGenerator : MonoBehaviour
                 }
                 */
 
+                //Draw the actual pixel
                 texture.SetPixel(i, j, new Color(brightness, brightness, brightness));
             }
         }

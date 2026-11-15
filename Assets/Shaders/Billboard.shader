@@ -1,3 +1,5 @@
+//Still fresh from unity library, not edits yet.
+
 Shader "Custom/Billboard"
 {
     Properties

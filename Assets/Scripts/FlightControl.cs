@@ -1,5 +1,6 @@
 using UnityEngine;
 
+//This script is attached to the player prefab and controls how it files camera movement accordingly.
 public class FlightControl : MonoBehaviour
 {
     float Yaw;
@@ -11,11 +12,6 @@ public class FlightControl : MonoBehaviour
     GameObject CamNode;
     [SerializeField]
     Camera camera;
-
-    void Start()
-    {
-        
-    }
 
     // Update is called once per frame
     void Update()
@@ -31,6 +27,7 @@ public class FlightControl : MonoBehaviour
         float TargetPitch = 0;
         float TargetRoll = 0;
 
+        //Inputs, determine where the plane should rotate to.
         if (Input.GetKey(KeyCode.D))
         {
             TargetRoll -= 1f;
@@ -56,13 +53,16 @@ public class FlightControl : MonoBehaviour
             TargetYaw += 1f;
         }
 
+        //Slowly lerp rotation speed to target rotation speed to smooth it out.
         Roll = Mathf.Lerp(Roll, TargetRoll, Time.deltaTime * 3f);
         Pitch = Mathf.Lerp(Pitch, TargetPitch, Time.deltaTime * 3f);
         Yaw = Mathf.Lerp(Yaw, TargetYaw, Time.deltaTime * 3f);
 
+        //Apply current rotation speed
         Vector3 rotatespd = new Vector3(Pitch, Yaw, Roll) * Time.deltaTime * 120f;
         transform.Rotate(rotatespd);
 
+        //Similar idea for speed forward.
         float TargetSpeed = 10;
         if (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.LeftShift))
         {
@@ -72,10 +72,10 @@ public class FlightControl : MonoBehaviour
         transform.position += transform.forward * Time.deltaTime * Speed;
     }
 
-    void CamUpdate()  //Bend camera the other way when plane rotates.
+    void CamUpdate()
     {
-        CamNode.transform.localEulerAngles = -10 * new Vector3(Pitch, Yaw, Roll);
-        camera.fieldOfView = 40 + Speed * 2;
+        CamNode.transform.localEulerAngles = -10 * new Vector3(Pitch, Yaw, Roll); //Bend camera the other way when plane rotates.
+        camera.fieldOfView = 40 + Speed * 2; //Zoom out when plane goes fast.
     }
 
 }
