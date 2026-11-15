@@ -1,8 +1,9 @@
-using System.Linq.Expressions;
 using UnityEngine;
 
 public class PerlinNoiseGenerator : MonoBehaviour
 {
+    public static PerlinNoiseGenerator instance; 
+
     [SerializeField]
     int resolution = 256;
 
@@ -23,12 +24,14 @@ public class PerlinNoiseGenerator : MonoBehaviour
 
 
     public Texture2D texture2D;
-    Texture2D texture2Da;
-    Texture2D texture2Db;
-    Texture2D texture2Dc;
+    public Texture2D texture2Da;
+    public Texture2D texture2Db;
+    public Texture2D texture2Dc;
 
-    void Start()
+    private void Awake()
     {
+        instance = this;
+
         texture2D = new Texture2D(resolution, resolution);
         texture2Da = Generate2DPerlinNoiseTexture(texture2D.width, perlinPowerA);
         texture2Db = Generate2DPerlinNoiseTexture(texture2D.width, perlinPowerB);
@@ -43,18 +46,22 @@ public class PerlinNoiseGenerator : MonoBehaviour
                 Color colorC = texture2Dc.GetPixel(i, j);
                 float combinedBrightness = (colorA.r * AlphaA + colorB.r * AlphaB + colorC.r * AlphaC); //Average the brightness of the three textures
                 combinedBrightness = Mathf.Clamp01((combinedBrightness - 0.5f) * 5f);//Clamp and multiply to make certain gray areas show while clipper lower ones
-                texture2D.SetPixel(i, j, new Color(combinedBrightness, combinedBrightness, combinedBrightness));
-                texture2D.SetPixel(i, j, new Color(1,1,1, combinedBrightness));
+                texture2D.SetPixel(i, j, new Color(1, 1, 1, combinedBrightness));
             }
         }
 
 
         //texture2D = texture2Da;
         texture2D.Apply(); //Uploades to gpu memory
-        if (GetComponent<Renderer>() != null) 
+        if (GetComponent<Renderer>() != null)
         {
             GetComponent<Renderer>().material.SetTexture("_BaseMap", texture2D); //Sets the quad's texture to the generated texture
         }
+    }
+
+    void Start()
+    {
+
     }
 
     // Update is called once per frame
@@ -102,7 +109,7 @@ public class PerlinNoiseGenerator : MonoBehaviour
             for (int j = 0; j < vectors2D.GetLength(1); j++)
             {
                 //Generate a random unit vector
-                float theta = Random.Range(0f, Mathf.PI * 2f); //Select random theta
+                float theta = Random.Range(0, Mathf.PI * 2f); //Select random theta
                 Vector2 vector = new Vector2();
                 vector = new Vector2(Mathf.Cos(theta), Mathf.Sin(theta)); //Convert to unit vector
                 vectors2D[i, j] = vector; //point vector in that direction
@@ -144,11 +151,13 @@ public class PerlinNoiseGenerator : MonoBehaviour
                 float finalLerp = Mathf.Lerp(lerp01, lerp23, smoothYCurve);
                 float brightness = ((finalLerp + 1) / 2); // Normalize to [0, 1] range
 
+                /*
                 if (i == 30 && j == 30)
                 {
                     Debug.Log("pixelPerVectorX = " + pixelPerVector);
                     Debug.Log(gridX);
                 }
+                */
 
                 texture.SetPixel(i, j, new Color(brightness, brightness, brightness));
             }
