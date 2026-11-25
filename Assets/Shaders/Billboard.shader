@@ -1,55 +1,71 @@
-//Still fresh from unity library, not edits yet.
-
-Shader "Custom/Billboard"
+// This shader draws a texture on the mesh.
+Shader "Assets/Shader/Billboard.shader"
 {
+    // The _BaseMap variable is visible in the Material's Inspector, as a field
+    // called Base Map.
     Properties
     {
-        _Color ("Color", Color) = (1,1,1,1)
-        _MainTex ("Albedo (RGB)", 2D) = "white" {}
-        _Glossiness ("Smoothness", Range(0,1)) = 0.5
-        _Metallic ("Metallic", Range(0,1)) = 0.0
+        [MainTexture] _BaseMap("Base Map", 2D) = "white" {}
     }
+
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
-        LOD 200
+        Tags { "RenderType" = "Transparent" "RenderPipeline" = "UniversalPipeline" }
 
-        CGPROGRAM
-        // Physically based Standard lighting model, and enable shadows on all light types
-        #pragma surface surf Standard fullforwardshadows
-
-        // Use shader model 3.0 target, to get nicer looking lighting
-        #pragma target 3.0
-
-        sampler2D _MainTex;
-
-        struct Input
+        Pass
         {
-            float2 uv_MainTex;
-        };
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
 
-        half _Glossiness;
-        half _Metallic;
-        fixed4 _Color;
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-        // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
-        // See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
-        // #pragma instancing_options assumeuniformscaling
-        UNITY_INSTANCING_BUFFER_START(Props)
-            // put more per-instance properties here
-        UNITY_INSTANCING_BUFFER_END(Props)
+            struct Attributes
+            {
+                float4 positionOS   : POSITION;
+                // The uv variable contains the UV coordinate on the texture for the
+                // given vertex.
+                float2 uv           : TEXCOORD0;
+            };
 
-        void surf (Input IN, inout SurfaceOutputStandard o)
-        {
-            // Albedo comes from a texture tinted by color
-            fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
-            o.Albedo = c.rgb;
-            // Metallic and smoothness come from slider variables
-            o.Metallic = _Metallic;
-            o.Smoothness = _Glossiness;
-            o.Alpha = c.a;
+            struct Varyings
+            {
+                float4 positionHCS  : SV_POSITION;
+                // The uv variable contains the UV coordinate on the texture for the
+                // given vertex.
+                float2 uv           : TEXCOORD0;
+            };
+
+            // This macro declares _BaseMap as a Texture2D object.
+            TEXTURE2D(_BaseMap);
+            // This macro declares the sampler for the _BaseMap texture.
+            SAMPLER(sampler_BaseMap);
+
+            CBUFFER_START(UnityPerMaterial)
+                // The following line declares the _BaseMap_ST variable, so that you
+                // can use the _BaseMap variable in the fragment shader. The _ST
+                // suffix is necessary for the tiling and offset function to work.
+                float4 _BaseMap_ST;
+            CBUFFER_END
+
+            Varyings vert(Attributes IN)
+            {
+                Varyings OUT;
+                OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+                // The TRANSFORM_TEX macro performs the tiling and offset
+                // transformation.
+                OUT.uv = TRANSFORM_TEX(IN.uv, _BaseMap);
+                return OUT;
+            }
+
+            half4 frag(Varyings IN) : SV_Target
+            {
+                // The SAMPLE_TEXTURE2D marco samples the texture with the given
+                // sampler.
+                half4 color = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv);
+                return color;
+            }
+            ENDHLSL
         }
-        ENDCG
     }
-    FallBack "Diffuse"
 }
