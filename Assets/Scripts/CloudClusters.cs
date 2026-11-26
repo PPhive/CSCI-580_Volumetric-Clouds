@@ -44,8 +44,12 @@ public class CloudClusters : MonoBehaviour
                         float height = noiseHeight.GetPixel(i, j).r * 100 - 50;
                         spawnNode.transform.localPosition = new Vector3(i - center, height * 0.3f, j - center);
                         GameObject spawnedParticle = Instantiate(cloudParticle, spawnNode.transform.position, Random.rotation);
+
+
+                        //Pass data to the particle
                         spawnedParticle.GetComponent<CloudParticle>().noiseGap = pixelHigh; //passes noise gap to particle
-                        spawnedParticle.transform.parent = transform;
+
+                        //spawnedParticle.transform.parent = transform;
                     }
                 }
             }
