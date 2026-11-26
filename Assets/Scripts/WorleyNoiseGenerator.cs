@@ -17,12 +17,8 @@ public class WorleyNoiseGenerator : MonoBehaviour
 
     void Awake()
     {
-        instance = this;    
-    }
+        instance = this;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
         texture2D = Generate2DWorleyNoiseTexture(resolution, worleyResolution);
         texture2D.Apply(); //Uploades to gpu memory
         if (GetComponent<Renderer>() != null)
