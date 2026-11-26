@@ -23,14 +23,12 @@ public class WorleyNoiseGenerator : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        /*
         texture2D = Generate2DWorleyNoiseTexture(resolution, worleyResolution);
         texture2D.Apply(); //Uploades to gpu memory
         if (GetComponent<Renderer>() != null)
         {
             GetComponent<Renderer>().material.SetTexture("_BaseMap", texture2D); //Sets the quad's texture to the generated texture
         }
-        */
     }
 
     public Texture2D Generate2DWorleyNoiseTexture(int resolution, int noiseResolution) 
