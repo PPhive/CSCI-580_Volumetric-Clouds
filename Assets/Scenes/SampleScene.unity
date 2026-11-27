@@ -613,7 +613,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 92935109229455015, guid: c2b28aafaf732f94e923fba2552d042d, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4390072165576872681, guid: c2b28aafaf732f94e923fba2552d042d, type: 3}
       propertyPath: m_LocalScale.x
@@ -855,7 +855,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 92935109229455015, guid: c2b28aafaf732f94e923fba2552d042d, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4390072165576872681, guid: c2b28aafaf732f94e923fba2552d042d, type: 3}
       propertyPath: m_LocalScale.x
@@ -1026,6 +1026,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 906561419049668146, guid: df43b45603ea86044afd6badc09363ff, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6544051247117027620, guid: df43b45603ea86044afd6badc09363ff, type: 3}
       propertyPath: m_Name
       value: WorleyNoiseGenerator

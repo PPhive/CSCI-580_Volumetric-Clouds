@@ -7,6 +7,7 @@ public class PerlinNoiseGenerator : MonoBehaviour
 
     [SerializeField]
     int resolution = 256;
+    int noiseResolution = 64;
 
     [SerializeField]
     int perlinPowerA = 4;
@@ -29,32 +30,15 @@ public class PerlinNoiseGenerator : MonoBehaviour
     public Texture2D texture2Db;
     public Texture2D texture2Dc;
 
+    public Texture2D texture3D;
+
+
     private void Awake()
     {
         instance = this;
 
-        //Creates a multi channel perlin noise for cloud rendering.
-        texture2D = new Texture2D(resolution, resolution);
-        texture2Da = Generate2DPerlinNoiseTexture(texture2D.width, perlinPowerA);
-        texture2Db = Generate2DPerlinNoiseTexture(texture2D.width, perlinPowerB);
-        texture2Dc = Generate2DPerlinNoiseTexture(texture2D.width, perlinPowerC);
+        GenerateMultChannelPerlinNoise();
 
-        //Merges all 3 subchannels into one. Btw the final channel uses alphat channel for sake of transparancy.
-        for (int i = 0; i < texture2D.width; i++)
-        {
-            for (int j = 0; j < texture2D.height; j++)
-            {
-                Color colorA = texture2Da.GetPixel(i, j);
-                Color colorB = texture2Db.GetPixel(i, j);
-                Color colorC = texture2Dc.GetPixel(i, j);
-                float combinedBrightness = (colorA.r * AlphaA + colorB.r * AlphaB + colorC.r * AlphaC); //Average the brightness of the three textures
-                combinedBrightness = Mathf.Clamp01((combinedBrightness - 0.5f) * 5f);//Clamp and multiply to make certain gray areas show while clipper lower ones
-                texture2D.SetPixel(i, j, new Color(1, 1, 1, combinedBrightness));
-            }
-        }
-
-
-        //texture2D = texture2Da;
         texture2D.Apply(); //Uploades to gpu memory
         if (GetComponent<Renderer>() != null)
         {
@@ -62,10 +46,6 @@ public class PerlinNoiseGenerator : MonoBehaviour
         }
     }
 
-    void Start()
-    {
-
-    }
     public Texture2D Generate2DPerlinNoiseTexture(int resolution, int perlinPower)
     {
         Texture2D texture = new Texture2D(resolution, resolution);
@@ -81,10 +61,9 @@ public class PerlinNoiseGenerator : MonoBehaviour
             Debug.Log("Perlin power too big, I don't think ur pc can handle above 10");
             return texture;
         }
+
         int VectorDimention = Mathf.FloorToInt(Mathf.Pow(2, perlinPower));
         Vector2[,] vectors2D = new Vector2[VectorDimention + 1, VectorDimention + 1]; //Number of vectors in one dimension, +1 so it wraps around
-
-
 
         //Resize the texture if it's too small or not divisible by 2^perlinPower
         if (texture.width < VectorDimention) 
@@ -150,14 +129,6 @@ public class PerlinNoiseGenerator : MonoBehaviour
                 float finalLerp = Mathf.Lerp(lerp01, lerp23, smoothYCurve);
                 float brightness = ((finalLerp + 1) / 2); // Normalize to [0, 1] range
 
-                /*
-                if (i == 30 && j == 30)
-                {
-                    Debug.Log("pixelPerVectorX = " + pixelPerVector);
-                    Debug.Log(gridX);
-                }
-                */
-
                 //Draw the actual pixel
                 texture.SetPixel(i, j, new Color(brightness, brightness, brightness));
             }
@@ -165,5 +136,39 @@ public class PerlinNoiseGenerator : MonoBehaviour
 
         texture.wrapMode = TextureWrapMode.Repeat;
         return texture;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    void GenerateMultChannelPerlinNoise() 
+    {
+        //Creates a multi channel perlin noise for cloud rendering.
+        texture2D = new Texture2D(resolution, resolution);
+        texture2Da = Generate2DPerlinNoiseTexture(texture2D.width, perlinPowerA);
+        texture2Db = Generate2DPerlinNoiseTexture(texture2D.width, perlinPowerB);
+        texture2Dc = Generate2DPerlinNoiseTexture(texture2D.width, perlinPowerC);
+
+        //Merges all 3 subchannels into one. Btw the final channel uses alphat channel for sake of transparancy.
+        for (int i = 0; i < texture2D.width; i++)
+        {
+            for (int j = 0; j < texture2D.height; j++)
+            {
+                Color colorA = texture2Da.GetPixel(i, j);
+                Color colorB = texture2Db.GetPixel(i, j);
+                Color colorC = texture2Dc.GetPixel(i, j);
+                float combinedBrightness = (colorA.r * AlphaA + colorB.r * AlphaB + colorC.r * AlphaC); //Average the brightness of the three textures
+                combinedBrightness = Mathf.Clamp01((combinedBrightness - 0.5f) * 5f);//Clamp and multiply to make certain gray areas show while clipper lower ones
+                texture2D.SetPixel(i, j, new Color(1, 1, 1, combinedBrightness));
+            }
+        }
     }
 }
