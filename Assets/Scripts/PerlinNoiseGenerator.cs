@@ -138,17 +138,6 @@ public class PerlinNoiseGenerator : MonoBehaviour
         return texture;
     }
 
-
-
-
-
-
-
-
-
-
-
-
     void GenerateMultChannelPerlinNoise() 
     {
         //Creates a multi channel perlin noise for cloud rendering.
