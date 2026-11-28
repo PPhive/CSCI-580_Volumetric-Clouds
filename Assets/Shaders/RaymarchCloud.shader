@@ -1,3 +1,9 @@
+// Based on the approach in Sebastian Lague's "Coding Adventure: Clouds" (2019)
+// and https:github.com/SebLague/Clouds (MIT License, Copyright (c) 2019 Sebastian Lague):
+// ray-box intersection, light march, and light-energy accumulation follow his structure.
+// Ray-box slab method: Majercik et al., JCGT 2018. Density model: Schneider, "The Real-Time
+// Volumetric Cloudscapes of Horizon Zero Dawn" (SIGGRAPH 2015).
+
 Shader "Custom/RaymarchCloud"{
     Properties{
         _DensityTexture ("Density Texture", 3D) = "" {}
